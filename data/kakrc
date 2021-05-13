@@ -1,0 +1,248 @@
+# Appearance
+add-highlighter global/ number-lines -relative -hlcursor
+add-highlighter global/ show-matching
+# add-highlighter global/ regex \h+$ 0:Error
+# add-highlighter global/ column "%opt{autowrap_column}" default,rgb:3c3836
+set-option global scrolloff 1,3
+set-option global ui_options ncurses_assistant=none ncurses_set_title=false
+colorscheme gruvbox
+
+# Indentation
+set-option global tabstop 4
+set-option global aligntab false
+set-option global indentwidth 4
+hook global InsertChar \t %{ try %{
+    execute-keys -draft "h<a-h><a-k>\A\h+\z<ret><a-;>;%opt{indentwidth}@"
+}}
+hook global InsertDelete ' ' %{ try %{
+    execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
+}}
+
+# Completion with tab
+hook global InsertCompletionShow .* %{
+    map window insert <tab> <c-n>
+    map window insert <s-tab> <c-p>
+}
+hook global InsertCompletionHide .* %{
+    unmap window insert <tab> <c-n>
+    unmap window insert <s-tab> <c-p>
+}
+
+# Keybindings for user mode
+map global user q ": quit<ret>" -docstring "quit"
+map global user w ": write<ret>" -docstring "write"
+map global user e ": write-quit<ret>" -docstring "write and quit"
+map global user c ": comment-line<ret>" -docstring "comment line"
+map global user C ": comment-block<ret>" -docstring "comment block"
+
+# Switch buffers
+map global goto b "<esc>: buffer-next<ret>" -docstring "next buffer"
+map global goto B "<esc>: buffer-previous<ret>" -docstring "previous buffer"
+
+# Copy/paste from clipboard
+map global user y "<a-|>xsel --input --clipboard<ret>" -docstring "yank to clipboard"
+map global user p "<a-!>xsel --output --clipboard<ret>" -docstring "paste from clipboard after selection"
+map global user P "!xsel --output --clipboard<ret>" -docstring "paste from clipboard before selection"
+
+# Goto git hunk
+map global goto g "<esc>: git next-hunk<ret>" -docstring "next hunk"
+map global goto G "<esc>: git prev-hunk<ret>" -docstring "previous hunk"
+
+# Show git diff
+hook global WinCreate .* %{ evaluate-commands %sh{
+    is_work_tree=$(cd "$(dirname "${kak_buffile}")" && git rev-parse --is-inside-work-tree 2>/dev/null)
+    [ "${is_work_tree}" = "true" ] && \
+        printf "%s\n" "git show-diff
+            hook global BufWritePost %val{buffile} %{git update-diff}
+            hook global BufReload %val{buffile} %{git update-diff}
+            hook global WinDisplay %val{buffile} %{git update-diff}
+            hook global NormalIdle %val{buffile} %{git update-diff}
+            hook global InsertIdle %val{buffile} %{git update-diff}"
+}}
+
+# Find command
+define-command find -params 1 -shell-script-candidates %{ fd --type f --hidden } %{ edit %arg{1} } \
+    -docstring "find <filename>: recursively search and edit a file"
+alias global f find
+map global user f ":find " -docstring "find and edit a file"
+
+# Grep command
+set-option global grepcmd "rg --vimgrep --follow"
+alias global g grep
+map global user g ":grep " -docstring "search for given regex recursively"
+
+# Fix comment character for scheme files
+hook global WinSetOption filetype=scheme %{
+    set-option window comment_line ';;'
+    set-option window indentwidth 2
+}
+
+hook global WinSetOption filetype=c %{
+    set-option window formatcmd astyle
+    map global user t ": format<ret>" -docstring "format document"
+}
+
+# Settings when using as a man pager
+hook global WinSetOption filetype=man %{
+    remove-highlighter global/number-lines_-relative_-hlcursor
+}
+
+# Plugins
+require-module plug
+plug plug https://github.com/alexherbo2/plug.kak %{
+    # define-command plug-upgrade -docstring 'plug-upgrade' %{
+    #     plug-install
+    #     plug-execute tree git submodule update --init --recursive
+    #     plug-execute tree cargo install --locked --force --path . --features "rust bash json css html"
+    # }
+}
+
+plug prelude https://github.com/alexherbo2/prelude.kak
+plug auto-pairs https://github.com/alexherbo2/auto-pairs.kak %{
+    auto-pairs-enable
+}
+
+plug search-highlighter https://github.com/alexherbo2/search-highlighter.kak %{
+    set-face global Search black,yellow+f
+    search-highlighter-enable
+}
+
+plug-old ansi https://github.com/eraserhd/kak-ansi
+
+plug parinfer https://github.com/eraserhd/parinfer-rust %{
+    hook global WinSetOption filetype=(clojure|lisp|scheme|racket) %{
+        parinfer-enable-window -smart
+    }
+}
+
+plug-old lsp https://github.com/kak-lsp/kak-lsp %{
+    set-option global lsp_cmd "kak-lsp -c %val{config}/kak-lsp.toml -s %val{session}"
+    hook global WinSetOption filetype=(rust) %{
+        lsp-enable-window
+
+        # hook global BufWritePre .* lsp-formatting
+        # set-option global lsp_auto_highlight_references true
+        set-option global lsp_diagnostic_line_error_sign "!"
+        set-option global lsp_diagnostic_line_warning_sign "?"
+        set-face global DiagnosticError red+u
+        set-face global DiagnosticWarning yellow+u
+        set-face global InlayDiagnosticError comment
+        set-face global InlayDiagnosticWarning comment
+        set-face global InlayHint comment
+        hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
+        hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
+        hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
+        hook -once -always window WinSetOption filetype=.* %{
+            remove-hooks window semantic-tokens
+        }
+        # lsp-inlay-diagnostics-enable window
+
+        map global user r ": lsp-rename-prompt<ret>" -docstring "rename symbol"
+        map global user a ": lsp-code-actions<ret>" -docstring "code actions"
+        map global user h ": lsp-hover<ret>" -docstring "hover info"
+        map global user H ": lsp-signature-help<ret>" -docstring "signature help"
+        map global user t ": lsp-formatting<ret>" -docstring "format document"
+        map global goto d "<esc>: lsp-definition<ret>" -docstring "definition"
+        map global goto y "<esc>: lsp-type-definition<ret>" -docstring "type definition"
+        map global goto m "<esc>: lsp-goto-next-match<ret>" -docstring "next reference"
+        map global goto M "<esc>: lsp-goto-previous-match<ret>" -docstring "previous reference"
+        map global goto e "<esc>: lsp-find-error --include-warnings<ret>" -docstring "next error or warning"
+        map global goto E "<esc>: lsp-find-error --previous --include-warnings<ret>" -docstring "previous error or warning"
+        map global goto <a-e> "<esc>: lsp-find-error<ret>" -docstring "next error"
+        map global goto <a-E> "<esc>: lsp-find-error --previous<ret>" -docstring "previous error"
+        map global goto i "<esc>: lsp-implementation<ret>" -docstring "implementation"
+        map global goto n "<esc>: lsp-diagnostics<ret>" -docstring "diagnostics"
+        map global goto r "<esc>: lsp-references<ret>" -docstring "references"
+
+        # Map <c-n> to select next snippet placeholder
+        define-command -hidden insert-c-n %{
+            try %{
+                lsp-snippets-select-next-placeholders
+                execute-keys '<a-;>d'
+            } catch %{
+                execute-keys -with-hooks '<c-n>'
+            }
+        }
+        map global insert <c-n> "<a-;>: insert-c-n<ret>"
+
+        # Rust-specific
+        # hook window -group rust-inlay-hints BufReload .* rust-analyzer-inlay-hints
+        # hook window -group rust-inlay-hints NormalIdle .* rust-analyzer-inlay-hints
+        # hook window -group rust-inlay-hints InsertIdle .* rust-analyzer-inlay-hints
+        # hook -once -always window WinSetOption filetype=.* %{
+        #     remove-hooks window rust-inlay-hints
+        # }
+        # set-option global lsp_server_configuration rust.clippy_preference="on"
+
+        # set-option global lsp_server_initialization_options rust-analyzer.procMacro.enable=false
+        # set-option global lsp_server_initialization_options rust-analyzer.cargo.loadOutDirsFromCheck=true
+        # set-option global lsp_server_initialization_options rust-analyzer.diagnostics.disabled=["unresolved-proc-macro"]
+        # set-option global lsp_server_configuration rust-analyzer.procMacro.enable=false
+        # set-option global lsp_server_configuration rust-analyzer.diagnostics.disabled=["unresolved-proc-macro"]
+    }
+}
+
+plug-old tree https://github.com/ul/kak-tree %{
+    set-option global tree_cmd "kak-tree -c %val{config}/kak-tree.toml"
+    hook global WinSetOption filetype=(rust) %{
+        declare-user-mode tree-parent
+        map global normal '#' ": enter-user-mode tree-parent<ret>" -docstring "enter tree-parent mode"
+        map global tree-parent n "<esc>: tree-select-parent-node<ret>" -docstring "parent node"
+        map global tree-parent b "<esc>: tree-select-parent-node block<ret>" -docstring "block"
+        map global tree-parent f "<esc>: tree-select-parent-node function_item<ret>" -docstring "function"
+        map global tree-parent F "<esc>: tree-select-parent-node function_signature_item<ret>" -docstring "function signature"
+        map global tree-parent c "<esc>: tree-select-parent-node closure_expression<ret>" -docstring "closure"
+        map global tree-parent p "<esc>: tree-select-parent-node parameters<ret>" -docstring "parameters"
+        map global tree-parent P "<esc>: tree-select-parent-node parameter<ret>" -docstring "parameter"
+        map global tree-parent s "<esc>: tree-select-parent-node struct_item<ret>" -docstring "struct item"
+        map global tree-parent S "<esc>: tree-select-parent-node field_declaration<ret>" -docstring "field declaration"
+        map global tree-parent <a-s> "<esc>: tree-select-parent-node struct_expression<ret>" -docstring "struct expression"
+        # map global tree-parent <a-S> "<esc>: tree-select-parent-node field_declaration_list<ret>" -docstring "field declaration list"
+        map global tree-parent e "<esc>: tree-select-parent-node enum_item<ret>" -docstring "enum item"
+        map global tree-parent E "<esc>: tree-select-parent-node enum_variant<ret>" -docstring "enum variant"
+        map global tree-parent <a-e> "<esc>: tree-select-parent-node enum_expression<ret>" -docstring "enum expression"
+        # map global tree-parent <a-E> "<esc>: tree-select-parent-node enum_variant_list<ret>" -docstring "enum variant list"
+        map global tree-parent t "<esc>: tree-select-parent-node trait_item<ret>" -docstring "trait item"
+        map global tree-parent y "<esc>: tree-select-parent-node type_item<ret>" -docstring "type item"
+        map global tree-parent p "<esc>: tree-select-parent-node impl_item<ret>" -docstring "impl item"
+        map global tree-parent a "<esc>: tree-select-parent-node attribute_item<ret>" -docstring "attribute item"
+        map global tree-parent A "<esc>: tree-select-parent-node inner_attribute_item<ret>" -docstring "inner attribute item"
+        map global tree-parent g "<esc>: tree-select-parent-node generic_type<ret>" -docstring "generic_type"
+        map global tree-parent q "<esc>: tree-select-parent-node where_clause<ret>" -docstring "where clause"
+        map global tree-parent Q "<esc>: tree-select-parent-node where_predicate<ret>" -docstring "where predicate"
+        map global tree-parent i "<esc>: tree-select-parent-node if_expression<ret>" -docstring "if expression"
+        map global tree-parent w "<esc>: tree-select-parent-node while_expression<ret>" -docstring "while expression"
+        map global tree-parent r "<esc>: tree-select-parent-node for_expression<ret>" -docstring "for expression"
+        map global tree-parent o "<esc>: tree-select-parent-node loop_expression<ret>" -docstring "loop expression"
+
+        # map global tree-parent m "<esc>: tree-select-parent-node match_block<ret>" -docstring "match block"
+        # map global tree-parent M "<esc>: tree-select-parent-node match_arm<ret>" -docstring "match arm"
+        # map global tree-parent <a-m> "<esc>: tree-select-parent-node match_expression<ret>" -docstring "match expression"
+        # # map global tree-parent <a-m> "<esc>: tree-select-parent-node match_pattern<ret>" -docstring "match pattern"
+
+        map global tree-parent m "<esc>: tree-select-parent-node match_expression<ret>" -docstring "match expression"
+        map global tree-parent M "<esc>: tree-select-parent-node match_arm<ret>" -docstring "match arm"
+        map global tree-parent <a-m> "<esc>: tree-select-parent-node match_pattern<ret>" -docstring "match pattern"
+        # map global tree-parent m "<esc>: tree-select-parent-node match_block<ret>" -docstring "match block"
+
+        map global tree-parent u "<esc>: tree-select-parent-node use_declaration<ret>" -docstring "use declaration"
+        map global tree-parent U "<esc>: tree-select-parent-node use_list<ret>" -docstring "use list"
+        map global tree-parent h "<esc>: tree-select-parent-node mod_item<ret>" -docstring "mod item"
+        map global tree-parent l "<esc>: tree-select-parent-node let_declaration<ret>" -docstring "let declaration"
+        map global tree-parent v "<esc>: tree-select-parent-node macro_definition<ret>" -docstring "macro definition"
+        map global tree-parent V "<esc>: tree-select-parent-node macro_rule<ret>" -docstring "macro rule"
+        map global tree-parent x "<esc>: tree-select-parent-node comment<ret>" -docstring "comment"
+
+        declare-user-mode tree-children
+        map global normal \' ": enter-user-mode tree-children<ret>" -docstring "enter tree-children mode"
+        map global tree-children n "<esc>: tree-select-children<ret>" -docstring "children"
+        map global tree-children p "<esc>: tree-select-children parameter<ret>" -docstring "parameter"
+        map global tree-children s "<esc>: tree-select-children field_declaration<ret>" -docstring "field declaration"
+        map global tree-children e "<esc>: tree-select-children enum_variant<ret>" -docstring "enum variant"
+        map global tree-children a "<esc>: tree-select-children inner_attribute_item<ret>" -docstring "inner attribute item"
+        map global tree-children m "<esc>: tree-select-children match_arm<ret>" -docstring "match arm"
+        map global tree-children <a-m> "<esc>: tree-select-children match_pattern<ret>" -docstring "match pattern"
+        map global tree-children l "<esc>: tree-select-children let_declaration<ret>" -docstring "let declaration"
+        map global tree-children x "<esc>: tree-select-children comment<ret>" -docstring "comment"
+    }
+}

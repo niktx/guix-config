@@ -1,0 +1,24 @@
+snippet_support = true
+verbosity = 2
+
+[server]
+timeout = 1800
+
+[semantic_tokens]
+type = "type"
+variable = "variable"
+namespace = "module"
+function = "function"
+string = "string"
+keyword = "keyword"
+operator = "operator"
+comment = "comment"
+
+[semantic_modifiers]
+documentation = "documentation"
+readonly = "default+d"
+
+[language.rust]
+filetypes = ["rust"]
+roots = ["Cargo.toml"]
+command = "rust-analyzer"

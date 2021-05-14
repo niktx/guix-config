@@ -203,7 +203,17 @@ xmodmap ~/.Xmodmap")
      'kakoune-config home-files-service-type
      `(("config/kak/kakrc" ,(local-file "data/kakrc"))
        ("config/kak/kak-lsp.toml" ,(local-file "data/kak-lsp.toml"))
-       ("config/kak/kak-tree.toml" ,(local-file "data/kak-tree.toml"))))
+       ("config/kak/kak-tree.toml" ,(local-file "data/kak-tree.toml"))
+       ("config/kak/autoload/plugins/core"
+        ,(file-append kakoune "/share/kak/autoload"))
+       ("config/kak/autoload/plugins/lsp"
+        ,(file-append kak-lsp "/share/cargo/src/kak-lsp-9.0.0/rc"))
+       ;; ("config/kak/autoload/plugins/tree"
+       ;;  ,(file-append kak-tree "/share/kak/rc"))
+       ("config/kak/autoload/plugins/parinfer"
+        ,(file-append parinfer-rust "/share/kak/rc"))
+       ("config/kak/autoload/plugins/search-highlighter"
+        ,(file-append kak-search-highlighter "/share/kak/rc"))))
     (simple-service
      'tig-config home-files-service-type
      `(("config/tig/config" ,(plain-file "tig-config" %tig-config))))

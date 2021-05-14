@@ -66,16 +66,16 @@ GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM=auto
 prompt() {
-    status=\"$?\"
-    directory=\"\\[\\e[1;34m\\]\\w\\[\\e[00m\\]\"
-    git=\"$(__git_ps1 ' \\[\\e[1;36m\\] %s\\[\\e[00m\\]')\"
+    local status=\"$?\"
+    local directory=\"\\[\\e[1;34m\\]\\w\\[\\e[0m\\]\"
+    local git=\"$(__git_ps1 ' \\[\\e[1;36m %s\\[\\e[0m\\]')\"
     if [ -n \"$GUIX_ENVIRONMENT\" ]; then
-        env=\" \\[\\e[1;00m\\][env]\\[\\e[00m\\]\"
+        local env=\" [env]\"
     fi
     if [ \"$status\" = \"0\" ]; then
-        indicator=\" \\[\\e[1;32m\\]$\\[\\e[00m\\]\"
+        local indicator=\" \\[\\e[1;32m\\]$\\[\\e[0m\\]\"
     else
-        indicator=\" \\[\\e[1;31m\\]$\\[\\e[00m\\]\"
+        local indicator=\" \\[\\e[1;31m\\]$\\[\\e[0m\\]\"
     fi
     PS1=\"${directory}${git}${env}${indicator} \"
 }

@@ -153,8 +153,7 @@ xmodmap ~/.Xmodmap")
            (email . "niklas@n1ks.net")
            (signing-key . "F4047D8CF4CCCBD7F04CAC4446D2BA9AB7079F73")))
          (core
-          ((ignore-case . #f)
-           (pager . "less -F -X")))
+          ((ignore-case . #f)))
          (commit
           ((gpg-sign . #t)))
          (pull

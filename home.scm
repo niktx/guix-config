@@ -150,7 +150,10 @@ xmodmap ~/.Xmodmap")
           "export VISUAL=kak"
           "export PAGER=\"less -R\""
           "export PATH=\"$HOME/.local/bin:$PATH\""
-          "export PATH=\"$HOME/.cargo/bin:$PATH\""))
+          "export PATH=\"$HOME/.cargo/bin:$PATH\""
+          "export CC=gcc"
+          "export RUST_SRC_PATH=\"$GUIX_HOME_ENVIRONMENT_DIRECTORY/lib/rustlib/src/rust/library\""
+          "export OPENSSL_DIR=$(openssl version -d | sed 's/OPENSSLDIR: \"//' | sed 's/\"//' | sed 's;/share.*;;')"))
        (bashrc
         (append
          '("shopt -s histappend"

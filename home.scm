@@ -195,10 +195,10 @@ xmodmap ~/.Xmodmap")
        (list
         (ssh-host "vps"
                   `((user . "niklas")
-                    (host-name "n1ks.net")))
+                    (host-name . "n1ks.net")))
         (ssh-host "pi"
                   `((user . "pi")
-                    (host-name "raspberrypi")))))))
+                    (host-name . "raspberrypi")))))))
     (simple-service
      'tmux-config home-files-service-type
      `(("tmux.conf" ,(plain-file "tmux-config" %tmux-config))))

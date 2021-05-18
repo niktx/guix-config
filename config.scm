@@ -1,9 +1,8 @@
 (use-modules
   (gnu)
-  (gnu packages gnome)
-  (gnu packages xorg)
   (nongnu packages linux)
   (nongnu system linux-initrd))
+(use-package-modules gnome xorg)
 (use-service-modules desktop linux networking pm virtualization xorg)
 
 (operating-system
@@ -14,14 +13,15 @@
   (timezone "Europe/Berlin")
   (keyboard-layout (keyboard-layout "de"))
   (host-name "t14-guix")
-  (users (cons* (user-account
-                  (name "niklas")
-                  (comment "Niklas Sauter")
-                  (group "users")
-                  (home-directory "/home/niklas")
-                  (supplementary-groups
-                    '("wheel" "netdev" "audio" "video" "kvm" "libvirt")))
-                %base-user-accounts))
+  (users
+    (cons* (user-account
+             (name "niklas")
+             (comment "Niklas Sauter")
+             (group "users")
+             (home-directory "/home/niklas")
+             (supplementary-groups
+              '("wheel" "netdev" "audio" "video" "kvm" "libvirt")))
+           %base-user-accounts))
   (packages
     (append
       (list (specification->package "nss-certs"))

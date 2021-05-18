@@ -122,12 +122,6 @@ set-option -g status-right \"#{pane_title}\"")
 color title-focus black blue bold
 bind status P !git push origin")
 
-(define %pijul-config
-  "[author]
-name = \"n1ks\"
-full_name = \"Niklas Sauter\"
-email = \"niklas@n1ks.net\"")
-
 (define %xmodmap-config
   "keycode 110 = XF86AudioPrev
 keycode 115 = XF86AudioPlay
@@ -221,9 +215,6 @@ xmodmap ~/.Xmodmap")
     (simple-service
      'tig-config home-files-service-type
      `(("config/tig/config" ,(plain-file "tig-config" %tig-config))))
-    (simple-service
-     'pijul-config home-files-service-type
-     `(("config/pijul/config.toml" ,(plain-file "pijul-config" %pijul-config))))
     (simple-service
      'xmodmap-config home-files-service-type
      `(("Xmodmap" ,(plain-file "xmodmap-config" %xmodmap-config))

@@ -1,14 +1,15 @@
-(use-modules (gnu home)
-             (gnu home-services)
-             (gnu home-services files)
-             (gnu home-services ssh)
-             (gnu home-services shells)
-             (gnu home-services version-control)
-             (gnu packages)
-             (gnu packages text-editors)
-             (gnu services)
-             (guix gexp)
-             (kakoune-xyz))
+(use-modules
+  (gnu home)
+  (gnu home-services)
+  (gnu home-services files)
+  (gnu home-services ssh)
+  (gnu home-services shells)
+  (gnu home-services version-control)
+  (gnu packages)
+  (gnu packages text-editors)
+  (gnu services)
+  (guix gexp)
+  (kakoune-xyz))
 
 (define %rust-packages
   '("rust"

@@ -105,9 +105,7 @@ PROMPT_COMMAND=prompt"))
     "alias cp='cp --interactive'"
     "alias ln='ln --interactive'"
     "alias qmv='qmv --format=destination-only'"
-    "alias qcp='qcp --format=destination-only'"
-    "alias cfg='git --git-dir \"$HOME/.cfg\" --work-tree \"$HOME\"'"
-    "alias cfg-tig='GIT_DIR=\"$HOME/.cfg\" GIT_WORK_TREE=\"$HOME\" tig'"))
+    "alias qcp='qcp --format=destination-only'"))
 
 (define %tmux-config
   "set-option -g default-terminal \"tmux-256color\"

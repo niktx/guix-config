@@ -11,14 +11,14 @@
 (define-public rust-src
   (package
     (name "rust-src")
-    (version "1.51.0")
+    (version "1.52.0")
     (source
       (origin
         (method url-fetch)
-        (uri (string-append "https://static.rust-lang.org/dist/2021-03-25/rust-src-"
+        (uri (string-append "https://static.rust-lang.org/dist/2021-05-06/rust-src-"
                             version ".tar.gz"))
         (file-name (string-append name "-" version ".tar.gz"))
-        (sha256 (base32 "0qqm60s9x0nhrab18m9rlz1hpihvc4f3jcldm2hrzh2v9jh4r40q"))))
+        (sha256 (base32 "09z2z5in9hxzcyp39g80msjbsg25ryxsbzisbrdwmypjzbqwn7c6"))))
     (build-system binary-build-system)
     (arguments
      `(#:install-plan

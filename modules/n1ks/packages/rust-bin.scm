@@ -1,4 +1,4 @@
-(define-module (rust-bin)
+(define-module (n1ks packages rust-bin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages gcc)
@@ -6,7 +6,7 @@
   #:use-module (guix download)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (nonguix build-system binary)
-  #:use-module (rust-ext))
+  #:use-module (n1ks packages rust-ext))
 
 (define-public rust-bin
   (package

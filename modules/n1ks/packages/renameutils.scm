@@ -1,4 +1,4 @@
-(define-module (renameutils)
+(define-module (n1ks packages renameutils)
   #:use-module (gnu packages readline)
   #:use-module (guix packages)
   #:use-module (guix download)

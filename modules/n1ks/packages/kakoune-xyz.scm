@@ -1,4 +1,4 @@
-(define-module (kakoune-xyz)
+(define-module (n1ks packages kakoune-xyz)
   #:use-module (gnu packages)
   #:use-module (gnu packages crates-io)
   #:use-module (gnu packages llvm)
@@ -10,6 +10,22 @@
   #:use-module (guix build-system cargo)
   #:use-module (guix build-system copy)
   #:use-module ((guix licenses) #:prefix license:))
+
+;; (define-public custom-kak-lsp
+;;   (package
+;;     (inherit kak-lsp)
+;;     (name "custom-kak-lsp")
+;;     (arguments
+;;       (substitute-keyword-arguments (package-arguments firefox)
+;;          ((#:phases phases)
+;;           `(modify-phases ,phases
+;;              (add-after 'install 'install-kakoune-rc
+;;                (lambda* (#:key outputs #:allow-other-keys)
+;;                  (let* ((out (assoc-ref outputs "out"))
+;;                         (out-rc (string-append out "/share/kak/rc")))
+;;                    (mkdir-p out-rc)
+;;                    (copy-file "rc/lsp.kak" (string-append out-rc "/lsp.kak")))
+;;                  #t))))))))
 
 (define-public kak-tree
   (package
@@ -26,7 +42,7 @@
         (file-name (git-file-name name version))
         (sha256 (base32 "0nsq2qnli8zsvqxgwwrlizcdk9i2013cxc11xssakrvqylx4wbi2"))
         (patches
-          (search-patches "patches/kak-tree-new-sloggers-version.patch"))))
+          (search-patches "kak-tree-new-sloggers-version.patch"))))
     (build-system cargo-build-system)
     (arguments
      `(#:features '("bash" "json" "rust")
@@ -109,7 +125,7 @@ syntax tree nodes. Parsing is performed with tree-sitter.")
         (file-name (string-append name "-" version ".tar.gz"))
         (sha256 (base32 "00fjyapvyi95g65iml0skppza0s1pigl3qvbkg319hy0m3mdhbvm"))
         (patches
-          (search-patches "patches/parinfer-rust-new-emacs-version.patch"))))
+          (search-patches "parinfer-rust-new-emacs-version.patch"))))
     (build-system cargo-build-system)
     (arguments
      `(#:cargo-inputs

@@ -1,4 +1,4 @@
-(define-module (rust-ext)
+(define-module (n1ks packages rust-ext)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages gcc)

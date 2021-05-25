@@ -1,4 +1,4 @@
-(define-module (mdbook)
+(define-module (n1ks packages mdbook)
   #:use-module (gnu packages base)
   #:use-module (gnu packages gcc)
   #:use-module (guix packages)

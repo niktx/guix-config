@@ -15,7 +15,7 @@ prompt() {
     local hostname=\"\\[\\e[1;35m\\]\\h\\[\\e[0m\\]\"")
           '())
     "    local directory=\"\\[\\e[1;34m\\]\\w\\[\\e[0m\\]\"
-    local git=\"$(__git_ps1 ' \\[\\e[1;36m %s\\[\\e[0m\\]')\"
+    local git=\"$(__git_ps1 ' \\[\\e[1;36m\\] %s\\[\\e[0m\\]')\"
     if [ -n \"$GUIX_ENVIRONMENT\" ]; then
         local env=\" [env]\"
     fi

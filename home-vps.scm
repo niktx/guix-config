@@ -1,5 +1,7 @@
 (use-modules
+  (gnu packages)
   (gnu home)
+  (gnu home-services)
   (gnu home-services ssh)
   (n1ks home-services bash)
   (n1ks home-services git)

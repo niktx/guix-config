@@ -40,7 +40,10 @@
    "The configuration file."))
 
 (define (add-kakoune-packages config)
-  (list (home-kakoune-configuration-kakoune config)))
+  (let ((plugins (home-kakoune-configuration-plugins config)))
+    (append
+      (list (home-kakoune-configuration-kakoune config))
+      (map home-kakoune-plugin-configuration-package plugins))))
 
 (define (add-kakoune-configuration config)
   (let ((plugins (home-kakoune-configuration-plugins config))

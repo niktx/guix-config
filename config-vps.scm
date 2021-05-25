@@ -1,5 +1,9 @@
-(use-modules (gnu))
-(use-service-modules admin certbot dbus docker desktop linux networking ssh web)
+(use-modules
+  (ice-9 textual-ports)
+  (gnu)
+  (n1ks services miniflux))
+(use-package-modules databases)
+(use-service-modules admin certbot databases dbus docker desktop linux networking ssh web)
 
 (define %nginx-deploy-hook
   (program-file
@@ -37,6 +41,20 @@
                       ,(local-file "data/mi9t-android.pub"))))))
       (service zram-device-service-type
         (zram-device-configuration (size "2G")))
+      (service postgresql-service-type
+        (postgresql-configuration
+          (postgresql postgresql-13)))
+      (service miniflux-service-type
+        (miniflux-configuration
+          (password (call-with-input-file
+                      "data/miniflux-database-password.txt"
+                      get-line))
+          (admin (miniflux-admin-configuration
+                   (username "admin")
+                   (password (call-with-input-file
+                               "data/miniflux-admin-password.txt"
+                               get-line))))
+          (extra-config '("LISTEN_ADDR=127.0.0.1:8080"))))
       (service certbot-service-type
         (certbot-configuration
           (email "niklas@n1ks.net")
@@ -115,7 +133,7 @@
                       (list
                         (nginx-location-configuration
                           (uri "/")
-                          (body '("proxy_pass http://localhost:8083;"
+                          (body '("proxy_pass http://localhost:8080;"
                                   "proxy_set_header Host $host;"
                                   "proxy_set_header X-Real-IP $remote_addr;"
                                   "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"

@@ -1,5 +1,0 @@
-[filetype.rust]
-group.identifier = ["identifier", "scoped_identifier"]
-group.parameters = ["parameters", "closure_parameters"]
-group.if_expression = ["if_expression", "if_let_expression"]
-group.while_expression = ["while_expression", "while_let_expression"]

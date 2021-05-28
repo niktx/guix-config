@@ -14,14 +14,14 @@
 
 (define %packages
   (append
-    ;; C/C++ developemnt
-    (list (specification->package+output "gcc-toolchain")
-          (specification->package+output "ccls"))
     ;; Rust development
     (list (specification->package+output "rust")
           (specification->package+output "rust:cargo")
           rust-src
           rust-analyzer-bin)
+    ;; C/C++ development
+    (list (specification->package+output "gcc-toolchain")
+          (specification->package+output "ccls"))
     ;; Command line tools
     (map (compose list specification->package+output)
      '("curl"
@@ -55,7 +55,7 @@
        "firefox"
        "flatpak"
        "font-iosevka"
-       ;; "geary"
+       "geary"
        "gimp"
        "graphviz"
        "libreoffice"

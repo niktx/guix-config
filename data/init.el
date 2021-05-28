@@ -12,6 +12,14 @@
 (tooltip-mode -1)
 (menu-bar-mode -1)
 
+;; Backup settings
+(setq backup-directory-alist '(("." . "~/.cache/emacs/backups")))
+(setq backup-by-copying t)
+(setq delete-old-versions t)
+(setq kept-new-versions 6)
+(setq kept-old-versions 2)
+(setq version-control t)
+
 ;; Tab settings
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)

@@ -252,4 +252,5 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (setq erc-prompt-for-password nil) ;; Use auth-sources for password
 (global-set-key (kbd "C-x E") (lambda () (interactive)
                                 (erc-tls :server "irc.libera.chat"
+                                         :port 6697
                                          :nick "n1ks")))

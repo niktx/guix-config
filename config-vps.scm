@@ -55,7 +55,8 @@
                    (password (call-with-input-file
                                "data/miniflux-admin-password.txt"
                                get-line))))
-          (extra-config '("LISTEN_ADDR=127.0.0.1:8080"))))
+          (extra-config '("LISTEN_ADDR=127.0.0.1:8080"
+                          "BASE_URL=https://feed.n1ks.net"))))
       (service coturn-service-type
         (coturn-configuration
           (extra-config

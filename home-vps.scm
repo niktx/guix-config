@@ -28,6 +28,6 @@
   (services
    (list (service home-bash-service-type
                   %bash-configuration-server)
-         (service home-ssh-configuration)
+         (service home-ssh-service-type)
          (service home-git-service-type
                   %git-configuration-server))))

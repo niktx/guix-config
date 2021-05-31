@@ -65,14 +65,14 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (defun guix-reconfigure-home ()
   "Run `guix home reconfigure'."
   (interactive)
-  (async-shell-command "guix home reconfigure ~/.config/guix/home.scm"))
+  (async-shell-command "guix home reconfigure ~/.config/guix/home-desktop.scm"))
 
 (defun guix-reconfigure-system ()
   "Run `guix system reconfigure'."
   (interactive)
   (async-shell-command
     (concat "echo " (shell-quote-argument (read-passwd "Password: "))
-            " | sudo -S guix system reconfigure ~/.config/guix/config.scm")))
+            " | sudo -S guix system reconfigure ~/.config/guix/system-desktop.scm")))
 
 (require 'general)
 (general-define-key

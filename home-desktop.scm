@@ -16,7 +16,8 @@
   (append
     ;; Rust development
     (list (specification->package+output "rust")
-          (specification->package+output "rust:cargo")
+          (specification->package+output "rust:rustfmt") ;; FIXME
+          (specification->package+output "rust:cargo") ;; FIXME
           rust-src
           rust-analyzer-bin)
     ;; C/C++ development

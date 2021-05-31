@@ -54,7 +54,7 @@
               (append (list "https://mirror.brielmaier.net")
                       %default-substitute-urls))
             (authorized-keys
-              (append (list (local-file "mirror.brielmaier.net.pub"))
+              (append (list (local-file "data/mirror.brielmaier.net.pub"))
                       %default-authorized-guix-keys)))))))
   (bootloader
     (bootloader-configuration

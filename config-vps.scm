@@ -1,6 +1,7 @@
 (use-modules
   (ice-9 textual-ports)
   (gnu)
+  (n1ks services coturn)
   (n1ks services miniflux))
 (use-package-modules databases)
 (use-service-modules admin certbot databases dbus docker desktop linux networking ssh web)
@@ -55,6 +56,27 @@
                                "data/miniflux-admin-password.txt"
                                get-line))))
           (extra-config '("LISTEN_ADDR=127.0.0.1:8080"))))
+      (service coturn-service-type
+        (coturn-configuration
+          (extra-config
+           `("verbose"
+             "simple-log"
+             "use-auth-secret"
+             ,(string-append "static-auth-secret="
+                             (call-with-input-file
+                               "data/coturn-auth-secret.txt"
+                               get-string-all))
+              "server-name=turn.n1ks.net"
+              "realm=turn.n1ks.net"
+              "cert=/etc/letsencrypt/live/turn.n1ks.net/fullchain.pem"
+              "pkey=/etc/letsencrypt/live/turn.n1ks.net/privkey.pem"
+              "external-ips=78.47.91.233"
+              "denied-peer-ips=10.0.0.0-10.255.255.255"
+              "denied-peer-ips=192.168.0.0-192.168.255.255"
+              "denied-peer-ips=172.16.0.0-172.31.255.255"
+              "allowed-peer-ips=10.0.0.1"
+              "user-quota=12"
+              "total-quota=1200"))))
       (service certbot-service-type
         (certbot-configuration
           (email "niklas@n1ks.net")

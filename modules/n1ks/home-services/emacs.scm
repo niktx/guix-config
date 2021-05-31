@@ -3,6 +3,7 @@
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu home-services emacs)
+  #:use-module (n1ks packages emacs-xyz)
   #:export (%emacs-configuration))
 
 (define %init-el
@@ -15,11 +16,12 @@
        (string-append (getenv "HOME") "/.config/guix/data/init.el")))))
 
 (define %packages
-  (list emacs-diminish
+  (list emacs-gruvbox-theme
         emacs-general
         emacs-kakoune
-        emacs-phi-search
         emacs-undo-tree
+        emacs-phi-search
+        emacs-hl-todo
         emacs-ivy
         emacs-ivy-rich
         emacs-hydra
@@ -33,6 +35,7 @@
         emacs-forge
         emacs-git-gutter
         emacs-rust-mode
+        emacs-cargo-mode
         emacs-ccls
         emacs-lsp-mode
         emacs-lsp-ui
@@ -44,9 +47,13 @@
         emacs-geiser
         emacs-geiser-guile
         emacs-guix
+        emacs-org
+        emacs-org-roam
+        emacs-markdown-mode
         emacs-eshell-syntax-highlighting
-        emacs-gruvbox-theme
-        emacs-hl-todo
+        emacs-eshell-toggle
+        emacs-elfeed
+        emacs-elfeed-protocol
         emacs-elpher))
 
 (define %emacs-configuration

@@ -11,6 +11,7 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (menu-bar-mode -1)
+(setq visible-bell t)
 
 ;; Backup settings
 (setq backup-directory-alist '(("." . "~/.cache/emacs/backups")))
@@ -33,7 +34,7 @@
 (require 'display-line-numbers)
 (setq display-line-numbers-type 'relative)
 (defcustom display-line-numbers-exempt-modes
-  '(eshell-mode lsp-ui-imenu-mode-hook)
+  '(shell-mode eshell-mode lsp-ui-imenu-mode elfeed-search-mode elfeed-show-mode)
   "Major modes on which to disable line numbers."
   :group 'display-line-numbers
   :type 'list
@@ -46,16 +47,42 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
     (display-line-numbers-mode)))
 (global-display-line-numbers-mode)
 
+;; Modeline
+(setq column-number-mode t)
+(defvar default-mode-line mode-line-format)
+(setq-default mode-line-format
+              '((:eval (cond ((string-match-p "\\*.*\\*" (buffer-name)) " ")
+                             (buffer-read-only " \ue0a2 ") ;; 
+                             ((buffer-modified-p) " \u25cf ") ;; ●
+                             (t " \u25cb "))) ;; ○
+                (:eval (propertize "%b" 'face 'bold))
+                " %l:%c ("
+                (:eval (propertize "%m" 'face 'italic))
+                ")"
+                (vc-mode vc-mode)))
+
+
+(defun guix-reconfigure-home ()
+  "Run `guix home reconfigure'."
+  (interactive)
+  (async-shell-command "guix home reconfigure ~/.config/guix/home.scm"))
+
+(defun guix-reconfigure-system ()
+  "Run `guix system reconfigure'."
+  (interactive)
+  (async-shell-command
+    (concat "echo " (shell-quote-argument (read-passwd "Password: "))
+            " | sudo -S guix system reconfigure ~/.config/guix/config.scm")))
 
 (require 'general)
-(define-prefix-command 'window-map)
 (general-define-key
   "C-j" 'scroll-up-command
   "C-k" 'scroll-down-command)
 
-(global-set-key (kbd "C-w") 'window-map)
+(define-prefix-command 'custom-window-map)
+(global-set-key (kbd "C-w") 'custom-window-map)
 (general-define-key
-  :prefix "C-w"
+  :keymaps 'custom-window-map
   "h" 'windmove-left
   "j" 'windmove-down
   "k" 'windmove-up
@@ -67,40 +94,47 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (define-prefix-command 'custom-map)
 (global-set-key (kbd "C-SPC") 'custom-map)
 (general-define-key
-  :prefix "C-SPC"
+  :keymaps 'custom-map
   "b" 'counsel-ibuffer
-  "f" 'counsel-find-file)
+  "f" 'counsel-find-file
+  "c" 'guix-reconfigure-home
+  "C" 'guix-reconfigure-system)
 
 (general-define-key
   :prefix "C-x"
   "e" 'eshell
+  "k" 'kill-current-buffer
+  "K" 'kill-buffer
+  "w" 'kill-buffer-and-window
   "s" 'save-buffer
   "S" 'save-some-buffers)
 
 
-(require 'diminish)
-(diminish 'auto-revert-mode)
-(diminish 'eldoc-mode)
-
 (require 'kakoune)
 (kakoune-setup-keybinds)
-(global-set-key (kbd "C-f") 'ryo-modal-mode)
+(global-set-key (kbd "\u00F6") #'ryo-modal-mode)
+(setq ryo-modal-cursor-type 'bar)
+(setq-default cursor-type 'box)
 (defun ryo-enter () "Enter normal mode." (interactive) (ryo-modal-mode 1))
 (add-hook 'prog-mode-hook #'ryo-enter)
 (defun kakoune-M-l (count)
   (interactive "p")
-  (set-mark (point))
   (end-of-line))
+(defun kakoune-M-h (count)
+  (interactive "p")
+  (beginning-of-line))
 (ryo-modal-keys
-  ("M-l" kakoune-M-l)
-  ("SPC" (("c" comment-line)))
+  ("M-l" kakoune-M-l :first '(kakoune-set-mark-here))
+  ("M-h" kakoune-M-h :first '(kakoune-set-mark-here))
+  ("SPC" (("c" comment-line)
+          ("s" save-buffer)
+          ("S" save-some-buffers)))
   ("," set-mark-command)
   ("C" mc/mark-next-lines)
   ("M-C" mc/mark-previous-lines))
 
 (require 'undo-tree)
 (global-undo-tree-mode)
-(diminish 'undo-tree-mode)
 (ryo-modal-keys
   ("u" undo-tree-undo)
   ("U" undo-tree-redo)
@@ -116,9 +150,11 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (global-set-key (kbd "C-s") 'phi-search)
 (global-set-key (kbd "C-r") 'phi-search-backward)
 
+(require 'hl-todo)
+(global-hl-todo-mode)
+
 (require 'ivy)
 (ivy-mode 1)
-(diminish 'ivy-mode)
 (general-define-key
   :keymaps 'ivy-minibuffer-map
   "TAB" 'ivy-alt-done
@@ -139,7 +175,6 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 (require 'projectile)
 (projectile-mode 1)
-(diminish 'projectile-mode)
 (setq projectile-project-search-path '("~/Programming"))
 (require 'counsel-projectile)
 (counsel-projectile-mode)
@@ -151,7 +186,6 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 (require 'which-key)
 (which-key-mode)
-(diminish 'which-key-mode)
 (setq which-key-idle-delay 0.2)
 
 (require 'magit)
@@ -162,6 +196,7 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
              magit-staged-section-map)
   "j" 'magit-section-forward
   "k" 'magit-section-backward)
+(define-key magit-mode-map (kbd "C-w") 'custom-window-map)
 (require 'magit-todos)
 (magit-todos-mode)
 (general-define-key
@@ -170,9 +205,10 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
   "j" 'magit-section-forward
   "k" 'magit-section-backward)
 
+(require 'forge)
+
 (require 'git-gutter)
 (global-git-gutter-mode 1)
-(diminish 'git-gutter-mode)
 (custom-set-variables
  '(git-gutter:hide-gutter t))
 (ryo-modal-keys
@@ -180,6 +216,10 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
         ("M-g" git-gutter:previous-hunk))))
 
 (require 'rust-mode)
+(require 'cargo-mode)
+(setq cargo-path-to-bin "cargo")
+(setq compilation-scroll-output t)
+(add-hook 'rust-mode-hook #'cargo-minor-mode)
 
 (require 'ccls)
 
@@ -206,11 +246,9 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 (require 'flycheck)
 (global-flycheck-mode)
-(diminish 'flycheck-mode)
 
 (require 'company)
 (global-company-mode)
-(diminish 'company-mode)
 ;; TODO: Setup TAB to cycle through the completion items
 (define-key lsp-mode-map (kbd "TAB") 'company-indent-or-complete-common)
 ;; (define-key company-active-map (kbd "TAB") 'company-complete-selection)
@@ -219,7 +257,6 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 (require 'yasnippet)
 (add-hook 'lsp-mode-hook #'yas-minor-mode-on)
-(diminish 'yas-minor-mode)
 
 (add-to-list 'load-path "/home/niklas/src/emacs-tree-sitter/core")
 (add-to-list 'load-path "/home/niklas/src/emacs-tree-sitter/lisp")
@@ -241,16 +278,47 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (require 'geiser-guile)
 
 (require 'guix)
+(global-set-key (kbd "C-SPC x") 'guix)
+
+(require 'org)
+(require 'org-roam)
+(setq org-roam-directory "~/Documents/notes")
+(setq org-roam-dailies-directory "journals/")
+(setq org-roam-capture-templates
+      '(("d" "default" plain
+         #'org-roam-capture--get-point "%?"
+         :file-name "pages/${slug}" :head "#+title: ${title}\n" :unnarrowed t)))
+(org-roam-mode)
+
+(require 'markdown-mode)
 
 (require 'eshell-syntax-highlighting)
 (eshell-syntax-highlighting-global-mode 1)
 
-(require 'hl-todo)
-(global-hl-todo-mode)
+(require 'eshell-toggle)
+(global-set-key (kbd "C-x E") 'eshell-toggle)
 
 (require 'erc)
 (setq erc-prompt-for-password nil) ;; Use auth-sources for password
-(global-set-key (kbd "C-x E") (lambda () (interactive)
-                                (erc-tls :server "irc.libera.chat"
-                                         :port 6697
-                                         :nick "n1ks")))
+(defun erc-tls-libera ()
+  "Run ERC and connect to the Libera Chat IRC server via TLS."
+  (interactive)
+  (erc-tls :server "irc.libera.chat"
+           :port 6697
+           :nick "n1ks"))
+
+(require 'elfeed)
+(general-define-key
+  :keymaps '(elfeed-search-mode-map elfeed-show-mode-map)
+  "j" 'next-line
+  "k" 'previous-line)
+(add-hook 'elfeed-show-mode-hook #'visual-line-mode)
+(require 'elfeed-protocol)
+(setq elfeed-feeds '(("fever+https://admin@feed.n1ks.net"
+                      :api-url "https://feed.n1ks.net/fever/"
+                      ;; :use-authinfo t))) ;; FIXME
+                      :password (shell-command-to-string
+                                 "secret-tool lookup miniflux-fever admin"))))
+(elfeed-protocol-enable)
+
+(require 'elpher)

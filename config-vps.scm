@@ -48,12 +48,12 @@
       (service miniflux-service-type
         (miniflux-configuration
           (password (call-with-input-file
-                      "data/miniflux-database-password.txt"
+                      "secrets/miniflux-database-password.txt"
                       get-line))
           (admin (miniflux-admin-configuration
                    (username "admin")
                    (password (call-with-input-file
-                               "data/miniflux-admin-password.txt"
+                               "secrets/miniflux-admin-password.txt"
                                get-line))))
           (extra-config '("LISTEN_ADDR=127.0.0.1:8080"
                           "BASE_URL=https://feed.n1ks.net"))))
@@ -65,7 +65,7 @@
              "use-auth-secret"
              ,(string-append "static-auth-secret="
                              (call-with-input-file
-                               "data/coturn-auth-secret.txt"
+                               "secrets/coturn-auth-secret.txt"
                                get-string-all))
              "server-name=turn.n1ks.net"
              "realm=turn.n1ks.net"

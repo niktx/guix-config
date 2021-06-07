@@ -21,6 +21,11 @@
 (setq kept-old-versions 2)
 (setq version-control t)
 
+;; Auto-save settings
+(make-directory "~/.cache/emacs/auto-saves" t)
+(setq auto-save-file-name-transforms '((".*" "~/.cache/emacs/auto-saves" t)))
+(setq auto-save-list-file-prefix "~/.cache/emacs/auto-save-list/.saves-")
+
 ;; Tab settings
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)

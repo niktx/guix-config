@@ -14,15 +14,16 @@
 
 (define %packages
   (append
-    ;; Rust development
-    (list (specification->package+output "rust")
-          (specification->package+output "rust:rustfmt") ;; FIXME
-          (specification->package+output "rust:cargo") ;; FIXME
-          rust-src
-          rust-analyzer-bin)
-    ;; C/C++ development
-    (list (specification->package+output "gcc-toolchain")
-          (specification->package+output "ccls"))
+    ;; Programming
+    (map (compose list specification->package+output)
+     '("gcc-toolchain"
+       "ccls"
+       "lldb"
+       "rust"
+       "rust:rustfmt"
+       "rust:cargo"))
+    (list (list rust-src "out")
+          (list rust-analyzer-bin "out"))
     ;; Command line tools
     (map (compose list specification->package+output)
      '("curl"

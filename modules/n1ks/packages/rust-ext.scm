@@ -58,35 +58,3 @@
 ;;     (description "This package provides a bunch of helpful lints to avoid common
 ;; pitfalls in Rust.")
 ;;     (license (list license:expat license:asl2.0))))
-
-(define-public rust-analyzer-bin
-  (package
-    (name "rust-analyzer-bin")
-    (version "2021-05-17")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append "https://github.com/rust-analyzer/rust-analyzer/releases/download/"
-                            version "/rust-analyzer-x86_64-unknown-linux-gnu.gz"))
-        (file-name (string-append name "-" version ".tar.gz"))
-        (sha256 (base32 "1zbf5x215a7h3a8yk84wjzbmhjrjk88vjbpsxcy2kf2dhzkqyqbn"))))
-    (build-system binary-build-system)
-    (arguments
-     `(#:patchelf-plan
-       `(("rust-analyzer"
-          ("glibc" "gcc:lib")))
-       #:install-plan
-       `(("rust-analyzer" "bin/"))
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'unpack
-           (lambda* (#:key source #:allow-other-keys)
-             (invoke "sh" "-c" (string-append "gunzip -cf '" source "' > rust-analyzer"))
-             (chmod "rust-analyzer" #o755))))))
-    (inputs
-     `(("glibc" ,glibc)
-       ("gcc:lib" ,gcc "lib")))
-    (synopsis "An experimental Rust compiler front-end for IDEs (binary package)")
-    (description "Rust-analyzer is an experimental modular compiler frontend for the Rust language.")
-    (home-page "https://rust-analyzer.github.io")
-    (license (list license:asl2.0 license:expat))))

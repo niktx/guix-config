@@ -21,9 +21,9 @@
        "lldb"
        "rust"
        "rust:rustfmt"
-       "rust:cargo"))
-    (list (list rust-src "out")
-          (list rust-analyzer-bin "out"))
+       "rust:cargo"
+       "rust-analyzer"))
+    (list (list rust-src "out"))
     ;; Command line tools
     (map (compose list specification->package+output)
      '("curl"

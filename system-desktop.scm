@@ -1,7 +1,9 @@
 (use-modules
   (gnu)
+  (guix gexp)
   (nongnu packages linux)
-  (nongnu system linux-initrd))
+  (nongnu system linux-initrd)
+  (n1ks services logiops))
 (use-package-modules gnome xorg)
 (use-service-modules desktop linux networking pm virtualization xorg)
 
@@ -36,6 +38,9 @@
                 (keyboard-layout keyboard-layout)))
             (service bluetooth-service-type
               (bluetooth-configuration (auto-enable? #t)))
+            (service logiops-service-type
+              (logiops-configuration
+                (config-file (local-file "data/logid.cfg"))))
             (service zram-device-service-type
               (zram-device-configuration (size "24G")))
             (service tlp-service-type)

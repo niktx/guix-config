@@ -4,14 +4,14 @@
   #:export (%bash-configuration-desktop
             %bash-configuration-server))
 
-(define* (prompt #:key prompt-display-host?)
+(define* (prompt #:key display-host?)
   `("source ~/.config/guix/data/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM=auto
 prompt() {
     local status=\"$?\""
-    ,@(if prompt-display-host?
+    ,@(if display-host?
           '("    local user=\"\\[\\e[1;35m\\]\\u\\[\\e[0m\\]\"
     local hostname=\"\\[\\e[1;35m\\]\\h\\[\\e[0m\\]\"")
           '())
@@ -25,7 +25,7 @@ prompt() {
     else
         local indicator=\" \\[\\e[1;31m\\]$\\[\\e[0m\\]\"
     fi"
-    ,@(if prompt-display-host?
+    ,@(if display-host?
           '("    PS1=\"${user}@${hostname}:${directory}${git}${env}${indicator} \"")
           '("    PS1=\"${directory}${git}${env}${indicator} \""))
     "}
@@ -42,15 +42,17 @@ PROMPT_COMMAND=prompt"))
 
 (define* (bash-configuration #:key prompt-display-host?)
   (home-bash-configuration
-   (bash-profile
-    '("export PATH=\"$HOME/.local/bin:$PATH\""
-      "export PATH=\"$HOME/.cargo/bin:$PATH\""
-      "export GUIX_PACKAGE_PATH=\"$HOME/.config/guix/guix-package-path\""
-      "export GUILE_LOAD_PATH=\"$HOME/src/rde:$GUILE_LOAD_PATH\""
-      "export GUILE_LOAD_PATH=\"$HOME/.config/guix/modules:$GUILE_LOAD_PATH\""))
+   (environment-variables
+    '(("PATH" . "\"$HOME/.local/bin:$PATH\"")
+      ("PATH" . "\"$HOME/.cargo/bin:$PATH\"")
+      ("XDG_DATA_DIRS" . "\"$HOME/.local/share/flatpak/exports/share:$XDG_DATA_DIRS\"")
+      ("GUIX_PACKAGE_PATH" . "\"$HOME/.config/guix/guix-package-path\"")
+      ("GUILE_LOAD_PATH" . "\"$HOME/src/rde:$GUILE_LOAD_PATH\"")
+      ("GUILE_LOAD_PATH" . "\"$HOME/.config/guix/modules:$GUILE_LOAD_PATH\"")
+      ("CC" . "gcc")))
    (bashrc
     (append
-     (prompt #:prompt-display-host? prompt-display-host?)
+     (prompt #:display-host? prompt-display-host?)
      %aliases))))
 
 (define %bash-configuration-desktop

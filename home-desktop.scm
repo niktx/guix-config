@@ -10,7 +10,7 @@
   (n1ks home-services emacs)
   (n1ks home-services git)
   (n1ks home-services xmodmap)
-  (n1ks packages rust-ext))
+  (n1ks packages rust))
 
 (define %packages
   (append

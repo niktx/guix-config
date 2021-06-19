@@ -13,13 +13,8 @@
 keycode 115 = XF86AudioPlay
 keycode 118 = XF86AudioNext")
 
-(define %xmodmap-script
-  "#!/bin/sh
-xmodmap ~/.Xmodmap")
-
 (define (add-xmodmap-configuration config)
-  `(("Xmodmap" ,(plain-file "xmodmap-config" %xmodmap-config))
-    ("xmodmap.sh" ,(plain-file "xmodmap-script" %xmodmap-script))))
+  `(("Xmodmap" ,(plain-file "xmodmap-config" %xmodmap-config))))
 
 (define (add-xmodmap-packages config)
   (list xmodmap))

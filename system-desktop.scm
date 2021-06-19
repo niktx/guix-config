@@ -5,7 +5,9 @@
   (nongnu system linux-initrd)
   (n1ks services logiops))
 (use-package-modules gnome xorg)
-(use-service-modules desktop linux networking pm virtualization xorg)
+(use-service-modules authentication desktop linux networking pm virtualization xorg)
+
+
 
 (operating-system
   (kernel linux)
@@ -36,6 +38,7 @@
               (xorg-configuration
                 (modules (delete xf86-input-synaptics %default-xorg-modules))
                 (keyboard-layout keyboard-layout)))
+            (service fprintd-service-type)
             (service bluetooth-service-type
               (bluetooth-configuration (auto-enable? #t)))
             (service logiops-service-type

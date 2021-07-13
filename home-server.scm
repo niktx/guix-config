@@ -23,7 +23,6 @@
      "wget")))
 
 (home-environment
-  (home-directory (getenv "HOME"))
   (packages %packages)
   (services
    (list (service home-bash-service-type

@@ -7,8 +7,6 @@
 (use-package-modules gnome xorg)
 (use-service-modules authentication desktop linux networking pm virtualization xorg)
 
-
-
 (operating-system
   (kernel linux)
   (initrd microcode-initrd)
@@ -29,7 +27,11 @@
              (group "users")
              (home-directory "/home/niklas")
              (supplementary-groups
-              '("wheel" "netdev" "audio" "video" "kvm" "libvirt" "i2c")))
+              '("wheel" ;; Required to use sudo
+                "netdev" ;; Required to manage network interfaces
+                "audio" "video" ;; Required to access audio and video devices
+                "kvm" "libvirt" ;; Required for virtual machines
+                "i2c"))) ;; Required to control i2c devices
            %base-user-accounts))
   (packages
     (append
@@ -60,10 +62,12 @@
                 "45-assign-i2c-group.rules"
                 "KERNEL==\"i2c-[0-9]*\", GROUP=\"i2c\", MODE=\"0660\"")))
       (modify-services %desktop-services
+        ;; Add openvpn plugin to network-manager
         (network-manager-service-type config =>
           (network-manager-configuration
             (inherit config)
             (vpn-plugins (list network-manager-openvpn))))
+        ;; Add substitution server for nonguix channel
         (guix-service-type config =>
           (guix-configuration
             (inherit config)

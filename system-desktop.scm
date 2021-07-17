@@ -17,6 +17,11 @@
   (timezone "Europe/Berlin")
   (keyboard-layout (keyboard-layout "de"))
   (host-name "t14-guix")
+  (groups
+    (cons* (user-group
+             (name "i2c")
+             (system? #t))
+           %base-groups))
   (users
     (cons* (user-account
              (name "niklas")
@@ -24,7 +29,7 @@
              (group "users")
              (home-directory "/home/niklas")
              (supplementary-groups
-              '("wheel" "netdev" "audio" "video" "kvm" "libvirt")))
+              '("wheel" "netdev" "audio" "video" "kvm" "libvirt" "i2c")))
            %base-user-accounts))
   (packages
     (append
@@ -49,7 +54,11 @@
             (service tlp-service-type)
             (service virtlog-service-type)
             (service libvirt-service-type
-              (libvirt-configuration (unix-sock-group "libvirt"))))
+              (libvirt-configuration (unix-sock-group "libvirt")))
+            (udev-rules-service 'assign-i2c-group
+              (udev-rule
+                "45-assign-i2c-group.rules"
+                "KERNEL==\"i2c-[0-9]*\", GROUP=\"i2c\", MODE=\"0660\"")))
       (modify-services %desktop-services
         (network-manager-service-type config =>
           (network-manager-configuration

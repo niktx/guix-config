@@ -12,10 +12,14 @@
   (n1ks home-services xmodmap)
   (n1ks packages rust))
 
+(define (specifications->package+output spec)
+  (map (compose list specification->package+output)
+       spec))
+
 (define %packages
   (append
     ;; Programming
-    (map (compose list specification->package+output)
+    (specifications->package+output
      '("gcc-toolchain"
        "ccls"
        "lldb"
@@ -25,7 +29,7 @@
        "rust-analyzer"))
     (list (list rust-src "out"))
     ;; Command line tools
-    (map (compose list specification->package+output)
+    (specifications->package+output
      '("curl"
        "fd"
        "htop"
@@ -45,17 +49,25 @@
        "youtube-dl"
        "zip"))
     ;; Additional Gnome packages
-    (map (compose list specification->package+output)
+    (specifications->package+output
      '("gnome-shell-extension-appindicator"
        "gnome-shell-extension-clipboard-indicator"
        "gnome-tweaks"))
+    ;; Flatpak packages
+    (specifications->package+output
+     '("flatpak"
+       "xdg-desktop-portal"
+       "xdg-desktop-portal-gtk"))
+    ;; Gaming packages
+    (specifications->package+output
+     '("dxvk"
+       "wine64"))
     ;; Miscellaneous
-    (map (compose list specification->package+output)
+    (specifications->package+output
      '("bluez"
        "celluloid"
        "evolution"
        "firefox"
-       "flatpak"
        "font-iosevka"
        "geary"
        "gimp"

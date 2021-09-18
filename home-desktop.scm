@@ -9,6 +9,7 @@
   (n1ks home-services bash)
   (n1ks home-services emacs)
   (n1ks home-services git)
+  (n1ks home-services legendary)
   (n1ks home-services xmodmap)
   (n1ks packages rust))
 
@@ -90,4 +91,5 @@
                   %git-configuration-desktop)
          (service home-emacs-service-type
                   %emacs-configuration)
+         (service home-legendary-service-type)
          (service home-xmodmap-service-type))))

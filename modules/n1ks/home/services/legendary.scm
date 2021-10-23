@@ -1,6 +1,5 @@
-(define-module (n1ks home-services legendary)
-  #:use-module (gnu home-services)
-  #:use-module (gnu home-services files)
+(define-module (n1ks home services legendary)
+  #:use-module (gnu home services)
   #:use-module (gnu services configuration)
   #:use-module (guix gexp)
   #:use-module (n1ks packages legendary)

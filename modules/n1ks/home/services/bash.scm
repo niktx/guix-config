@@ -1,6 +1,7 @@
-(define-module (n1ks home-services bash)
-  #:use-module (gnu home-services)
-  #:use-module (gnu home-services shells)
+(define-module (n1ks home services bash)
+  #:use-module (gnu home services)
+  #:use-module (gnu home services shells)
+  #:use-module (guix gexp)
   #:export (%bash-configuration-desktop
             %bash-configuration-server))
 
@@ -36,9 +37,7 @@ PROMPT_COMMAND=prompt"))
     "alias grep='grep --color=auto'"
     "alias mv='mv --interactive'"
     "alias cp='cp --interactive'"
-    "alias ln='ln --interactive'"
-    "alias qmv='qmv --format=destination-only'"
-    "alias qcp='qcp --format=destination-only'"))
+    "alias ln='ln --interactive'"))
 
 (define* (bash-configuration #:key prompt-display-host?)
   (home-bash-configuration
@@ -47,13 +46,19 @@ PROMPT_COMMAND=prompt"))
       ("PATH" . "\"$HOME/.cargo/bin:$PATH\"")
       ("XDG_DATA_DIRS" . "\"$HOME/.local/share/flatpak/exports/share:$XDG_DATA_DIRS\"")
       ("GUIX_PACKAGE_PATH" . "\"$HOME/.config/guix/guix-package-path\"")
-      ("GUILE_LOAD_PATH" . "\"$HOME/src/rde:$GUILE_LOAD_PATH\"")
       ("GUILE_LOAD_PATH" . "\"$HOME/.config/guix/modules:$GUILE_LOAD_PATH\"")
       ("CC" . "gcc")))
+   ;; FIXME
+   ;;(bashrc
+   ;; (append
+   ;;  (prompt #:display-host? prompt-display-host?)
+   ;;  %aliases))))
    (bashrc
-    (append
-     (prompt #:display-host? prompt-display-host?)
-     %aliases))))
+    (let* ((content-list (append
+                          (prompt #:display-host? prompt-display-host?)
+                          %aliases))
+           (content (string-join content-list "\n")))
+      (list (plain-file "bashrc" content))))))
 
 (define %bash-configuration-desktop
   (bash-configuration #:prompt-display-host? #f))

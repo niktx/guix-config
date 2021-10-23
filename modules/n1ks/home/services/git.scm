@@ -1,6 +1,7 @@
-(define-module (n1ks home-services git)
-  #:use-module (gnu home-services)
-  #:use-module (gnu home-services version-control)
+(define-module (n1ks home services git)
+  #:use-module (gnu home services)
+  ;; #:use-module (gnu home services version-control)
+  #:use-module (n1ks home services version-control-upstream)
   #:export (%git-configuration-desktop
             %git-configuration-server))
 
@@ -18,7 +19,7 @@
       (commit
        ((gpg-sign . #t)))
       (pull
-       ((rebase . #f)))
+       ((ff . "only")))
       (status
        ((short . #t)))
       (log
